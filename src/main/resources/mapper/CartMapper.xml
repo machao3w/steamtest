@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.machao.steamshop.dao.CartMapper">
+  <resultMap id="BaseResultMap" type="com.machao.steamshop.bean.Cart">
+    <id column="cart_id" jdbcType="INTEGER" property="cartId" />
+    <result column="buyer_id" jdbcType="INTEGER" property="buyerId" />
+    <result column="game_id" jdbcType="INTEGER" property="gameId" />
+    <result column="quantity" jdbcType="INTEGER" property="quantity" />
+  </resultMap>
+  <resultMap id ="CartWithGameAndUser" type="com.machao.steamshop.bean.Cart">
+  	<id column="cart_id" jdbcType="INTEGER" property="cartId" />
+    <result column="buyer_id" jdbcType="INTEGER" property="buyerId" />
+    <result column="game_id" jdbcType="INTEGER" property="gameId" />
+    <result column="quantity" jdbcType="INTEGER" property="quantity" />
+    <association property="user" javaType="com.machao.steamshop.bean.UserNew">
+    	<id column="user_id" jdbcType="INTEGER" property="userId" />
+    	<result column="user_name" jdbcType="VARCHAR" property="userName" />
+    </association>
+  	<association property="game" javaType="com.machao.steamshop.bean.Game">
+  		<id column="game_id" jdbcType="INTEGER" property="gameId" />
+    	<result column="game_name" jdbcType="VARCHAR" property="gameName" />
+    	<result column="game_price" jdbcType="INTEGER" property="gamePrice" />
+    	<result column="game_class" jdbcType="INTEGER" property="gameClass" />
+    	<result column="game_pic" jdbcType="VARCHAR" property="gamePic" />
+  		<association property="genres" javaType="com.machao.steamshop.bean.Genres">
+  			<id column="id" property="id"/>
+  			<result column="class_name" property="className"/>
+  		</association>
+  	</association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    cart_id, buyer_id, game_id, quantity
+  </sql>
+  <sql id="Base_Carts_SelectList">
+  	c.cart_id, c.buyer_id, c.game_id, c.quantity, u.user_id, g.game_id, g.game_name, g.game_price, g.game_pic, g.game_class, t.id, t.class_name
+  </sql>
+  <delete id="deleteByBuyerId" parameterType="java.lang.Integer">
+  	delete from carts
+  	where buyer_id = #{buyer_id}
+  </delete>
+  <delete id="deleteByGameId" parameterType="map">
+  	delete from carts
+  	where buyer_id = #{buyer_id} and game_id = #{game_id}
+  </delete>
+  <update id="resetCartQuantity" parameterType="map">
+  	update carts set quantity = #{quantity} where buyer_id = #{buyer_id} and game_id = #{game_id}
+  </update>
+  <update id="updateCart" parameterType="map">
+  	update carts set quantity = quantity + #{quantity} where buyer_id = #{buyer_id} and game_id = #{game_id}
+  </update>
+  <select id="isPutCart" parameterType="map" resultType="map">
+  	select * from carts where buyer_id = #{buyer_id} and game_id = #{game_id}
+  </select>
+  <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="CartWithGameAndUser"> 
+  	select
+    <include refid="Base_Carts_SelectList" />
+    from carts c
+    inner join user1 u on c.buyer_id = u.user_id
+    inner join games_new g on c.game_id = g.game_id
+    inner join game_genres t on g.game_class = t.id
+    where c.buyer_id = #{userId}
+  </select>
+  <insert id="putCart" parameterType="map">
+  	insert into carts (buyer_id, game_id, quantity) values (#{buyer_id}, #{game_id}, #{quantity})
+  </insert>
+  <select id="selectByExample" parameterType="com.machao.steamshop.bean.CartExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from carts
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from carts
+    where cart_id = #{cartId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from carts
+    where cart_id = #{cartId,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.machao.steamshop.bean.CartExample">
+    delete from carts
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.machao.steamshop.bean.Cart">
+    insert into carts (cart_id, buyer_id, game_id, 
+      quantity)
+    values (#{cartId,jdbcType=INTEGER}, #{buyerId,jdbcType=INTEGER}, #{gameId,jdbcType=INTEGER}, 
+      #{quantity,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.machao.steamshop.bean.Cart">
+    insert into carts
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="cartId != null">
+        cart_id,
+      </if>
+      <if test="buyerId != null">
+        buyer_id,
+      </if>
+      <if test="gameId != null">
+        game_id,
+      </if>
+      <if test="quantity != null">
+        quantity,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="cartId != null">
+        #{cartId,jdbcType=INTEGER},
+      </if>
+      <if test="buyerId != null">
+        #{buyerId,jdbcType=INTEGER},
+      </if>
+      <if test="gameId != null">
+        #{gameId,jdbcType=INTEGER},
+      </if>
+      <if test="quantity != null">
+        #{quantity,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.machao.steamshop.bean.CartExample" resultType="java.lang.Long">
+    select count(*) from carts
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update carts
+    <set>
+      <if test="record.cartId != null">
+        cart_id = #{record.cartId,jdbcType=INTEGER},
+      </if>
+      <if test="record.buyerId != null">
+        buyer_id = #{record.buyerId,jdbcType=INTEGER},
+      </if>
+      <if test="record.gameId != null">
+        game_id = #{record.gameId,jdbcType=INTEGER},
+      </if>
+      <if test="record.quantity != null">
+        quantity = #{record.quantity,jdbcType=INTEGER},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update carts
+    set cart_id = #{record.cartId,jdbcType=INTEGER},
+      buyer_id = #{record.buyerId,jdbcType=INTEGER},
+      game_id = #{record.gameId,jdbcType=INTEGER},
+      quantity = #{record.quantity,jdbcType=INTEGER}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.machao.steamshop.bean.Cart">
+    update carts
+    <set>
+      <if test="buyerId != null">
+        buyer_id = #{buyerId,jdbcType=INTEGER},
+      </if>
+      <if test="gameId != null">
+        game_id = #{gameId,jdbcType=INTEGER},
+      </if>
+      <if test="quantity != null">
+        quantity = #{quantity,jdbcType=INTEGER},
+      </if>
+    </set>
+    where cart_id = #{cartId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.machao.steamshop.bean.Cart">
+    update carts
+    set buyer_id = #{buyerId,jdbcType=INTEGER},
+      game_id = #{gameId,jdbcType=INTEGER},
+      quantity = #{quantity,jdbcType=INTEGER}
+    where cart_id = #{cartId,jdbcType=INTEGER}
+  </update>
+</mapper>

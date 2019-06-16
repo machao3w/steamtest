@@ -45,7 +45,6 @@ public class UserController {
 	
 	//µÇ³ö
 	
-	
 	//×¢²á
 	public String register() {
 		return "Register";

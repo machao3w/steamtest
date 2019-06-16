@@ -44,6 +44,7 @@
 						<thead>
 							<tr class="tr1">
 								<td>游戏名</td>
+								<td>图标</td>
 								<td>价格</td>
 								<td>分类</td>
 								<td>购买数量</td>
@@ -84,17 +85,20 @@ function build_game_table(result){
 	var games = result.extend.pageInfo.list;
 	$.each(games,function(index,item){
 		var gamename = $("<td></td>").append(item.gameName);
+		var gamepic = $("<img>").attr("src","${APP_PATH}/static/" + item.gamePic).attr("style","width: 80px;height: 80px;");
 		var gameprice = $("<td></td>").append(item.gamePrice);
 		var gamegenres = $("<td></td>").append(item.genres.className);
 		var buynum = $("<input>").addClass("quantity").val("1");
 		var delBtn = $("<button></button>").addClass("btn btn-primary btn-sm edit_btn")
 		.append($("<span></span>").addClass("glyphicon glyphicon-pencil")).append("删除");
 		delBtn.attr("edit_id",item.gameId);
-		var inputTd = $("<td></td>").append(buynum)
+		var picTd = $("<td></td>").append(gamepic);
+		var inputTd = $("<td></td>").append(buynum);
 		var btnTd = $("<td></td>").append(delBtn);
 		//返回元素
 		$("<tr></tr>")
 		.append(gamename)
+		.append(picTd)
 		.append(gameprice)
 		.append(gamegenres)
 		.append(inputTd)
@@ -102,6 +106,8 @@ function build_game_table(result){
 		.appendTo("#game_tabe tbody");
 	});
 }
+
+
 </script>
 
 

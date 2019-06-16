@@ -1,6 +1,6 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
-<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib uri="http://shiro.apache.org/tags" prefix="shiro"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://shiro.apache.org/tags" prefix="shiro"%>
 
 <!DOCTYPE HTML>
 <html>
@@ -19,7 +19,7 @@
 </head>
 
 <body>
-	<!-- 修改事件模态框 -->
+<!-- 修改-模态框 -->
 	<div class="modal fade" id="gameupdatemodal" tabindex="-1" role="dialog"
 		aria-labelledby="exampleModalLabel">
 		<div class="modal-dialog" role="document">
@@ -57,7 +57,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- 新增事件模态框 -->
+	<!-- 新增-模态框 -->
 	<div class="modal fade" id="gameaddmodal" tabindex="-1" role="dialog"
 		aria-labelledby="exampleModalLabel">
 		<div class="modal-dialog" role="document">
@@ -95,7 +95,6 @@
 			</div>
 		</div>
 	</div>
-	
 	<!-- 添加顶部导航栏 -->
 	<%@ include file="/WEB-INF/pages/common/nav_head.jsp"%>
 	<div class="container-fluid">
@@ -109,34 +108,42 @@
 							<li><a href="#">游戏列表</a></li>
 							<li class="active">管理</li>
 						</ol>
+
 					</div>
 					<div class="panel-body">
 						<div class="col-md-4">
 							<button class="btn btn-primary" id="game_add">
-								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增游戏
+								<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>新增
+							</button>
+							<button class="btn btn-warning" id="game_delete">
+								<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>删除
 							</button>
 						</div>
+						<table class="table table-hover" id="game_tabe">
+							<thead>
+								<tr class="tr1">
+									<td>游戏名</td>
+									<th>图标</th>
+									<td>价格</td>
+									<td>分类</td>
+									<td>操作</td>
+								</tr>
+							</thead>
+							<tbody>
+
+							</tbody>
+						</table>
 					</div>
-					<table class="table table-hover" id="game_tabe">
-						<thead>
-							<tr class="tr1">
-								<td>游戏名</td>
-								<td>价格</td>
-								<td>分类</td>
-								<td>操作</td>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
+
+				</div>
+				<div class="row">
+					<div class="col-md-6 col-md-offset-4" id="page_nav"></div>
+				</div>
+				<div class="row">
+					<div class="col-sm-6 col-md-offset-4" " id="page_info"></div>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-6 col-md-offset-4" id="page_nav"></div>
-			</div>
-			<div class="row">
-				<div class="col-sm-6 col-md-offset-4" " id="page_info"></div>
-			</div>
+
 		</div>
 	</div>
 </body>
@@ -165,22 +172,21 @@
 		var games = result.extend.pageInfo.list;
 		$.each(games, function(index, item) {
 			var gamename = $("<td></td>").append(item.gameName);
+			var gamepic = $("<img>").attr("src",
+					"${APP_PATH}/static/" + item.gamePic).attr("style",
+					"width: 80px;height: 80px;");
 			var gameprice = $("<td></td>").append(item.gamePrice);
 			var gamegenres = $("<td></td>").append(item.genres.className);
-			var editBtn = $("<button></button>").addClass(
-					"btn btn-primary btn-sm edit_btn").append(
-					$("<span></span>").addClass("glyphicon glyphicon-pencil"))
-					.append("修改");
-			editBtn.attr("edit_id", item.gameId);
-			var delBtn = $("<button></button>").addClass(
-					"btn btn-primary btn-sm edit_btn").append(
-					$("<span></span>").addClass("glyphicon glyphicon-pencil"))
-					.append("删除");
-			delBtn.attr("edit_id", item.gameId);
-			var btnTd = $("<td></td>").append(editBtn).append(" ").append(
-					delBtn);
+			var editBtn = $("<button></button>").addClass("btn btn-primary btn-sm edit_btn")
+			.append($("<span></span>").addClass("glyphicon glyphicon-pencil")).append("修改");
+			editBtn.attr("edit_id",item.gameId);
+			var delBtn = $("<button></button>").addClass("btn btn-warning btn-sm del_btn")
+			.append($("<span></span>").addClass("glyphicon glyphicon-trash")).append("删除");
+			delBtn.attr("del_id",item.gameId);
+			var btnTd = $("<td></td>").append(editBtn).append(" ").append(delBtn);
+			var picTd = $("<td></td>").append(gamepic);
 			//返回元素
-			$("<tr></tr>").append(gamename).append(gameprice)
+			$("<tr></tr>").append(gamename).append(picTd).append(gameprice)
 					.append(gamegenres).append(btnTd).appendTo(
 							"#game_tabe tbody");
 		});
@@ -195,7 +201,7 @@
 		totalRecord = result.extend.pageInfo.pages;
 		currentPage = result.extend.pageInfo.pageNum;
 	}
-	
+
 	function build_page_nav(result) {
 		$("#page_nav").empty();
 		var ul = $("<ul></ul>").addClass("pagination");
@@ -238,6 +244,7 @@
 		var navEle = $("<nav></nav>").append(ul);
 		navEle.appendTo("#page_nav");
 	}
+
 	//清空表单样式及内容
 	function reset_form(arg){
 		$(arg)[0].reset();
@@ -261,8 +268,14 @@
 			url:"${APP_PATH}/genres",
 			type:"GET",
 			success:function(result){
+				//result内为Genres信息
+				//console.log(result)
+				//F12得到的信息extend：{genres: [{id: 1, className: "角色扮演"}, 
+				//{id: 2, className: "动作"}, {id: 3, className: "射击"},…]}
+				//$("#genres_select")可直接用select的id
 				$.each(result.extend.genres,function(){
 					var optionEle = $("<option></option>").append(this.className).attr("value",this.id);
+					//optionEle.appendTo("#gameaddmodal select");
 					optionEle.appendTo(arg);
 				});
 			}
@@ -275,23 +288,27 @@
 		if(!regPrice.test(gamePrice)){
 			$("#game_price_input").parent().removeClass("has-success has-error");
 			$("#game_price_input").next("span").text("");
+			//$("#game_class_select").empty();
+			//show_validate_msg("#game_price_input","error","价格只为非负整数")；
 			$("#game_price_input").parent().addClass("has-error");
 			$("#game_price_input").next("span").text("价格只为非负整数");
 			return false;
 		}else{
 			$("#game_price_input").parent().removeClass("has-success has-error");
 			$("#game_price_input").next("span").text("");
+			//$("#game_class_select").empty();
+			//show_validate_msg("#game_price_input", "success", "");
 			$("#game_price_input").parent().addClass("has-success");
 			$("#game_price_input").next("span").text("");
 		}
 		return true;
-	}
-	//校验游戏名是否重复
+	};
 	$("#game_name_input").change(function(){
 		var gameName = this.value;
+		//alert("test");
 		$.ajax({
 			url:"${APP_PATH}/checkgame",
-			data:"gameName"+gameName,
+			data:"gameName="+gameName,
 			type:"POST",
 			success:function(result){
 				alert(result.code);
@@ -312,6 +329,7 @@
 	});
 
 	$("#game_save").click(function(){
+		//alert($("#gameaddmodal form").serialize());
 		if(!validate_add_form()){
 			return false;
 		}
@@ -334,6 +352,9 @@
 	});
 
 	$(document).on("click",".edit_btn",function(){
+	//.edit_btn").click(function(){
+		//alert("test");
+		//reset_form("#gameupdatemodal form");
 		getGenres("#gameupdatemodal select");
 		getGame($(this).attr("edit_id"));
 		$("#game_update").attr("edit_id",$(this).attr("edit_id"));
@@ -377,8 +398,8 @@
 		
 		$.ajax({
 			url:"${APP_PATH}/gameList/"+$(this).attr("edit_id"),
-			type:"PUT",
-			data:$("#gameupdatemodal form").serialize(),
+			type:"POST",
+			data:$("#gameupdatemodal form").serialize()+"&_method=PUT",
 			success:function(result){
 				alert(result.message);
 				$("#gameupdatemodal").modal("hide");
@@ -394,7 +415,8 @@
 		if(confirm("确认删除【"+gameName+"】?")){
 			$.ajax({
 				url:"${APP_PATH}/gameList/"+gameId,
-				type:"DELETE",
+				type : "POST",
+				data : "_method=DELETE",
 				success:function(result){
 					alert(result.message);
 					to_page(currentPage);
@@ -403,8 +425,10 @@
 		}
 		
 	});
+	
 </script>
 
 
 
 </html>
+

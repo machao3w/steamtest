@@ -46,5 +46,4 @@ public class GameService {
 		gameMapper.deleteByPrimaryKey(gameId);
 	}
 
-
 }

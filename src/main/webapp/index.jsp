@@ -328,7 +328,7 @@ $("#game_name_input").change(function(){
 	//alert("test");
 	$.ajax({
 		url:"${APP_PATH}/checkgame",
-		data:"gameName"+gameName,
+		data:"gameName="+gameName,
 		type:"POST",
 		success:function(result){
 			alert(result.code);
@@ -418,8 +418,8 @@ $("#game_update").click(function(){
 	
 	$.ajax({
 		url:"${APP_PATH}/gameList/"+$(this).attr("edit_id"),
-		type:"PUT",
-		data:$("#gameupdatemodal form").serialize(),
+		type:"POST",
+		data:$("#gameupdatemodal form").serialize()+"&_method=PUT",
 		success:function(result){
 			alert(result.message);
 			$("#gameupdatemodal").modal("hide");
@@ -434,7 +434,8 @@ $(document).on("click",".del_btn",function(){
 	if(confirm("确认删除【"+gameName+"】?")){
 		$.ajax({
 			url:"${APP_PATH}/gameList/"+gameId,
-			type:"DELETE",
+			type : "POST",
+			data : "_method=DELETE",
 			success:function(result){
 				alert(result.message);
 				to_page(currentPage);

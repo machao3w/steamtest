@@ -98,7 +98,7 @@
   	</where>
   </select>
   <select id="getRoles" parameterType="java.lang.String" resultType="java.lang.String">
-  	select distinct r.name from user1 u
+  	select distinct r.role_name from user1 u
   	inner join user_role ur on u.user_id = ur.u_id
   	inner join roles r on ur.r_id = r.role_id
   	where u.user_name = #{userName}

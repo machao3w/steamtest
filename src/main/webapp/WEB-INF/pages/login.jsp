@@ -16,7 +16,7 @@
 	src="${APP_PATH }/static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
 <style>
 body {
-	background: url("./static/img/1.jpg");
+	background: url("${APP_PATH }/static/img/1.jpg");
 	animation-name: myfirst;
 	animation-duration: 12s;
 	/*变换时间*/
@@ -29,7 +29,7 @@ body {
 }
 
 @keyframes myfirst { 
-	0% {background: url("${APP_PATH }/static/img/1.jpg");}
+	0% {background:url("${APP_PATH }/static/img/1.jpg");}
 	34%{background:url("${APP_PATH }/static/img/2.jpg");}
 	67%{background:url("${APP_PATH }/static/img/3.jpeg");}
 	100%{background:url("${APP_PATH }/static/img/1.jpg");}

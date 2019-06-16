@@ -5,7 +5,7 @@
 <nav class="navbar navbar-inverse" role="navigation">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="#">Steam商店</a>
+			<a class="navbar-brand" href="${APP_PATH}/gameIndex">Steam商店</a>
 		</div>
 		<div id="navbar">
 			<ul class="nav navbar-nav navbar-right">
@@ -20,7 +20,7 @@
 					<ul class="dropdown-menu">
 						<li><a href="#" class="btn btn-default btn-flat">个人中心</a></li>
 						<li><a href="#" class="btn btn-default btn-flat">修改密码</a></li>
-						<li><a href="/user/logOut" class="btn btn-default btn-flat">注销</a></li>
+						<li><a href="${APP_PATH}/logout" class="btn btn-default btn-flat">注销</a></li>
 					</ul></li>
 			</shiro:authenticated>
 			</ul>

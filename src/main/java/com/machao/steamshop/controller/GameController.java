@@ -25,6 +25,11 @@ public class GameController {
 	@Autowired
 	GameService gameService;
 	
+	@RequestMapping("/gameAdmin")
+	public String toAdmin() {
+		return "backend/GameManage";
+	}
+	
 	@RequestMapping("/gameIndex")
 	public String toIndex() {
 		return "front/GameList";
@@ -65,7 +70,7 @@ public class GameController {
 		boolean g = gameService.checkgame(gameName);
 		if(g) {
 			return Msg.success();
-		}else {
+		}else {	
 			return Msg.fail();
 		}
 	}

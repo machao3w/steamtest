@@ -9,11 +9,21 @@ public class Game {
 
     private Integer gameClass;
     
+    private String gamePic;
+    
     private Genres genres;
     
     
 
-    public Genres getGenres() {
+    public String getGamePic() {
+		return gamePic;
+	}
+
+	public void setGamePic(String gamePic) {
+		this.gamePic = gamePic;
+	}
+
+	public Genres getGenres() {
 		return genres;
 	}
 

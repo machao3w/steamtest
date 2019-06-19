@@ -175,9 +175,91 @@ Mybatis逆向工程|1.3.7
 shiro的主要功能就是认证与授权，由于我是基于角色授权，通过前端shiro标签过滤，所以整个认证授权过程十分简单。后期升级项目会考虑添加加盐加密以及记住我功能
 ## 自定义realm
 ```
+public class UserRealm extends AuthorizingRealm {
+	
+	@Autowired
+	private UserService userService;
+	@Override
+	public void setName(String name) {
+		// TODO Auto-generated method stub
+		super.setName("myRealm");
+	}
+
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+		String userName = (String) principals.getPrimaryPrincipal();
+		SimpleAuthorizationInfo simpleAuthorization = new SimpleAuthorizationInfo();
+		Set<String> roles = new HashSet<String>(userService.getRoles(userName));
+		simpleAuthorization.setRoles(roles);
+		return simpleAuthorization;
+	}
+
+	@Override
+	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+		String userName = (String) token.getPrincipal();
+		UserNew user = userService.selectByUsername(userName);
+		if(user == null) {
+			throw new UnknownAccountException("账户不存在！");
+		}
+		SimpleAuthenticationInfo simpleAuthenticationInfo = new SimpleAuthenticationInfo(user.getUserName(),
+		user.getUserPassword(), this.getName());
+		return simpleAuthenticationInfo;
+	}
+}
 ```
 ## 配制shiro
 ### web.xml
 ```
+    <filter>
+	<filter-name>shiroFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <async-supported>true</async-supported>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>shiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 ```
-### 
+### shiro在上下文应用的配制
+```
+<!-- 自定义logouturl -->
+<bean id="logout" class="org.apache.shiro.web.filter.authc.LogoutFilter">
+	<property name="redirectUrl" value="/user/loginPage"/>
+</bean>
+<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+<!-- Shiro的核心安全接口,这个属性是必须的 -->
+        <property name="securityManager" ref="securityManager" />
+        <!-- 认证提交地址，如果没有认证将返回此url，请求此地址将由formAuthenticationFilter进行认证 -->
+        <property name="loginUrl" value="/user/loginPage" />    
+        <property name="unauthorizedUrl" value="nopermission" /> <!--当没有权限的时候，跳转到这个url-->
+        <!-- <property name="filters">
+        	<map>
+        		<entry key="logout" value-ref="logoutFilter"/>
+        	</map>
+        </property> -->
+        <property name="filterChainDefinitions">
+            <value>
+            	<!-- 对静态资源设置匿名访问 -->
+            	/logout = logout
+            	/static/** = anon
+            	/order/** = authc
+            	/cart/** = authc
+            	/gameAdmin/**=authc,roles["admin"]
+            	/** = anon
+            	
+            </value>
+	</property>
+</bean>
+	<!-- securityManeger  -->
+<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+	<property name="realm" ref="myRealm"></property>
+</bean>
+<!-- realm -->
+<bean id="myRealm" class="com.machao.steamshop.shiro.UserRealm">
+</bean>
+```
+前台效果展示

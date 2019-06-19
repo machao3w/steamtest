@@ -262,4 +262,15 @@ public class UserRealm extends AuthorizingRealm {
 <bean id="myRealm" class="com.machao.steamshop.shiro.UserRealm">
 </bean>
 ```
-前台效果展示
+# 前台效果展示
+## 主界面
+![主界面](https://github.com/machao3w/steamtest/blob/master/images/%E5%89%8D%E5%8F%B01.jpg)
+## 购物车界面，jquery动态计算总计和总数
+![购物车界面，jquery动态计算总计和总数](https://github.com/machao3w/steamtest/blob/master/images/%E5%89%8D%E5%8F%B02.jpg)
+## post请求，补充收货信息并删除购物车
+![post请求，补充收货信息并删除购物车](https://github.com/machao3w/steamtest/blob/master/images/%E5%89%8D%E5%8F%B03.jpg)
+## 订单界面以及订单详情
+![订单界面以及订单详情](https://github.com/machao3w/steamtest/blob/master/images/%E5%89%8D%E5%8F%B05.jpg)
+## admin界面
+![admin界面](https://github.com/machao3w/steamtest/blob/master/images/%E5%90%8E%E5%8F%B01.jpg)
+
